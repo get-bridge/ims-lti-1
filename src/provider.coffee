@@ -6,7 +6,7 @@ extensions        = require './extensions'
 
 
 class Provider
-  constructor: (consumer_key, consumer_secret, nonceStore, signature_method=(new HMAC_SHA1()) ) ->
+  constructor: (consumer_key, consumer_secret, nonceStore, signature_method=(new HMAC_SHA1()), options = {} ) ->
 
     if typeof consumer_key is 'undefined' or consumer_key is null
       throw new errors.ConsumerError 'Must specify consumer_key'
@@ -25,6 +25,7 @@ class Provider
     @signer           = signature_method
     @nonceStore       = nonceStore
     @body             = {}
+    @supported_versions = options.supported_versions || require('./ims-lti').supported_versions
 
 
   # Verify parameter and OAuth signature by passing the request object
@@ -54,12 +55,12 @@ class Provider
     if not body
       return false
 
-    correct_version      = require('./ims-lti').supported_versions.indexOf(body.lti_version) isnt -1
+    correct_version      = @supported_versions.indexOf(body.lti_version) isnt -1
     has_resource_link_id = body.resource_link_id?
-    omits_content_item_params = 
+    omits_content_item_params =
       not body.resource_link_id? and
-      not body.resource_link_title? and 
-      not body.resource_link_description? and 
+      not body.resource_link_title? and
+      not body.resource_link_description? and
       not body.launch_presentation_return_url? and
       not body.lis_result_sourcedid?
     correct_version and

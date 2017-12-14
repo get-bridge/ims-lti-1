@@ -14,6 +14,7 @@ test-unit:
 	NODE_ENV=test multi=$(MULTI) \
 		./node_modules/.bin/mocha \
 			--reporter mocha-multi \
+      --grep 'allows caller to configure lti_version' \
 			$(MOCHA_OPTS)
 
 build: clean
